@@ -1,0 +1,1 @@
+const s=t=>{const e=new Date(t),a=e.getUTCFullYear(),r=String(e.getUTCMonth()+1).padStart(2,"0"),n=String(e.getUTCDate()).padStart(2,"0");return`${a}-${r}-${n}`},o=t=>{let e="Viewer";switch(t){case"player":e="Player/Individual";break;case"team":e="Team/Club";break;case"orgs":e="Organization";break;case"other":e="Other Personalities";break}return e};export{s as e,o as g};
