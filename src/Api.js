@@ -1,6 +1,6 @@
 import { start } from "@popperjs/core";
 
-const API_ENDPOINT = 'http://15.206.27.50:3009/api/v1/admin/';
+const API_ENDPOINT = 'http://15.206.66.165:3009/api/v1/admin/';
 
 const getUsers = async (searchParams) => {
   let url = API_ENDPOINT+'getAllUsers?'
