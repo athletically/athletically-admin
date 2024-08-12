@@ -58,7 +58,7 @@ const _nav = [
   {
     component: CNavItem,
     name: 'Games',
-    to: '/work-in-progress',
+    to: '/games/all',
     icon: <CIcon icon={cilGamepad} customClassName="nav-icon" />,
   },
   {

@@ -198,7 +198,21 @@ const adminLogin = async (username, password) => {
   }
 }
 
+const getGames = async (searchParams) => {
+  let url = API_ENDPOINT+'getGames?'
+  if(searchParams.searchStr && searchParams.searchStr != '')
+    url += `search=${searchParams.searchStr}&`
+  if(searchParams.filter && searchParams.filter != '')
+    url += `filter=${searchParams.filter}&`
+
+  const response = await fetch(url);
+  const data = await response.json();
+  if(data.err)
+    return [];
+  return data.data;
+}
 
 
 
-export { getUsers, getSportsList, getUserDetails, updateUserDetails, getReels, updateReel, getGroups, updateGroup, getGroupDetails, getPositionList, addNewGroup, adminLogin }
+
+export { getUsers, getSportsList, getUserDetails, updateUserDetails, getReels, updateReel, getGroups, updateGroup, getGroupDetails, getPositionList, addNewGroup, adminLogin, getGames }

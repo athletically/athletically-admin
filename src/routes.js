@@ -54,6 +54,7 @@ const Widgets = React.lazy(() => import('./views/widgets/Widgets'))
 const Users = React.lazy(() => import('./views/users/all_users'))
 const reels = React.lazy(() => import('./views/reels/all_reels'))
 const groups = React.lazy(() => import('./views/groups/all_groups'))
+const games = React.lazy(() => import('./views/games'))
 const workInProgress = React.lazy(() => import('./views/pages/workInProgress/WorkInProgress'))
 const login = React.lazy(() => import('./views/pages/login/Login'))
 
@@ -105,6 +106,7 @@ const routes = [
   { path: '/users/all', exact: true, name: 'Users', element: Users },
   { path: '/reels/all', exact: true, name: 'Reels', element: reels},
   { path: '/groups/all', exact: true, name: 'Groups', element: groups},
+  { path: '/games/all', exact: true, name: 'Games', element: games},
   { path: '/work-in-progress', exact: true, name: 'Work In Progress', element: workInProgress},
 ]
 
