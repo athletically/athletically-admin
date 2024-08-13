@@ -30,7 +30,7 @@ import {
 import {
   cilPencil
 } from '@coreui/icons'
-import { getGames, addNewGroup } from '../Api';
+import { getGames, addNewGame } from '../Api';
 import { extractDate, getTypeFormatted } from '../Utils'
 
 const Users = () => {
@@ -42,6 +42,7 @@ const Users = () => {
   const [alert, setAlert] = useState('');
   const [isUpdating, setUpdating] = useState(false);
   const [isInserting, setInserting] = useState(false);
+  const [selectedGame, setSelectedGame] = useState(false);
 
   useEffect(() => {
     fetchGames();
@@ -89,33 +90,33 @@ const Users = () => {
     fetchGames(searchTxt, filter);
   }
 
-  const getGroupDtls = async(e) => {
+  const getGameDtls = async(e) => {
     // setAlert(e.target.getAttribute('gr_id'));
-    let game = await getGroupDetails(e.target.getAttribute('gr_id'));
+    let game = await getGameDetails(e.target.getAttribute('gr_id'));
     if (!game) {
       setAlert('Something Went Wrong');
     }
-    await setSelectedGroup(game)
+    await setSelectedGame(game)
     await fetchPositions(game.game_id)
     setVisible(true);
     setUpdating(true);
     setAlertVisible(false)
   }
 
-  const handleGroupNameChange = (e) => {
+  const handleGameNameChange = (e) => {
     const name = e.target.value;
-    setSelectedGroup((prevGroup) => ({
-      ...prevGroup,
-      name: name === '' ? '' : name,
+    setSelectedGame((prevGame) => ({
+      ...prevGame,
+      game_name: name === '' ? '' : name,
     }));
   };
 
-  const updateGroupStatus = async(e) => {
+  const updateGameStatus = async(e) => {
     let game_id = e.target.id;
     let status = e.target.value;
     let gameName = '';
 
-    const isUpdated = await updateGroup(game_id, status, gameName);
+    const isUpdated = await updateGame(game_id, status, gameName);
 
     if(isUpdated){
       fetchGames(searchTxt, filter)
@@ -126,19 +127,19 @@ const Users = () => {
 
   }
 
-  // const updateGroupName = async(e) => {
-  //   let game_id = selectedGroup._id;
-  //   let status = selectedGroup.status;
-  //   let gameName = selectedGroup.name;
+  // const updateGameName = async(e) => {
+  //   let game_id = selectedGame._id;
+  //   let status = selectedGame.status;
+  //   let gameName = selectedGame.name;
 
-  //   const isUpdated = await updateGroup(game_id, status, gameName);
+  //   const isUpdated = await updateGame(game_id, status, gameName);
 
   //   if(isUpdated){
   //     fetchGames(searchTxt, filter)
   //     setVisible(false)
   //   }
   //   else{
-  //     setAlert('Unable to Modify Group. Check Group Name');
+  //     setAlert('Unable to Modify Game. Check Game Name');
   //     setAlertVisible(true);
   //   }
 
@@ -146,8 +147,8 @@ const Users = () => {
 
   const handleGameChange = async(e) => {
     const game_id = e.target.value;
-    setSelectedGroup((prevGroup) => ({
-      ...prevGroup,
+    setSelectedGame((prevGame) => ({
+      ...prevGame,
       game_id: game_id === '' ? '' : game_id,
     }));
     fetchPositions(game_id);
@@ -155,51 +156,40 @@ const Users = () => {
 
   const handlePositionChange = async(e) => {
     const position_id = e.target.value;
-    setSelectedGroup((prevGroup) => ({
-      ...prevGroup,
+    setSelectedGame((prevGame) => ({
+      ...prevGame,
       position_id: position_id === '' ? '' : position_id,
     }));
     fetchPositions(game_id);
   }
 
-  const openAddGroupModal = async(e) => {
+  const openAddGameModal = async(e) => {
     setVisible(true);
     setUpdating(false);
     setInserting(true);
-    setSelectedGroup({name: '', game_id: '', position_id: '', status: 'active'});
+    setSelectedGame({game_name: '', status: 'active'});
     setAlertVisible(false)
   }
 
-  // const addGroup = async(e) => {
+  const addGame = async(e) => {
 
-  //   if(selectedGroup.name === ''){
-  //     setAlert("Group name can't be empty");
-  //     setAlertVisible(true);
-  //     return;
-  //   }
+    if(selectedGame.name === ''){
+      setAlert("Game name can't be empty");
+      setAlertVisible(true);
+      return;
+    }
 
-  //   if(selectedGroup.game_id === ''){
-  //     setAlert("Please choose a sport");
-  //     setAlertVisible(true);
-  //     return;
-  //   }
+    const isAdded = await addNewGame(selectedGame);
 
-  //   if(selectedGroup.position_id === ''){
-  //     setAlert("Please choose a role");
-  //     setAlertVisible(true);
-  //     return;
-  //   }
-
-  //   const isAdded = await addNewGroup(selectedGroup);
-
-  //   if(isAdded){
-  //     fetchGames(searchTxt, filter)
-  //     setVisible(false)
-  //   }
-  //   else{
-  //     setAlertVisible(true);
-  //   }
-  // }
+    if(!isAdded.err){
+      fetchGames(searchTxt, filter)
+      setVisible(false)
+    }
+    else{
+      setAlert(isAdded.message);
+      setAlertVisible(true);
+    }
+  }
 
 
   return (
@@ -209,7 +199,7 @@ const Users = () => {
           <h3>All Games</h3>
         </div>
         <div className='d-flex justify-content-end w-50'>
-          <CButton color='primary' onClick={openAddGroupModal}>Add Game</CButton>
+          <CButton color='primary' onClick={openAddGameModal}>Add Game</CButton>
         </div>
       </CCardHeader>
       <CContainer fluid>
@@ -252,7 +242,7 @@ const Users = () => {
                 <CFormSelect
                   aria-label=""
                   value={game.status}
-                  onChange={updateGroupStatus}
+                  onChange={updateGameStatus}
                   id={game._id}
                 >
                   <option value="active">Active</option>
@@ -260,7 +250,7 @@ const Users = () => {
                 </CFormSelect>
               </CTableDataCell>
               <CTableDataCell>{extractDate(game.created_on)}</CTableDataCell>
-              <CTableDataCell className='text-center'><CIcon icon={cilPencil} gr_id={game._id} className="edit-icon" onClick={getGroupDtls}/></CTableDataCell>
+              <CTableDataCell className='text-center'><CIcon icon={cilPencil} gr_id={game._id} className="edit-icon" onClick={getGameDtls}/></CTableDataCell>
             </CTableRow>
           ))}
         </CTableBody>
@@ -268,7 +258,7 @@ const Users = () => {
       {(isUpdating || isInserting) && (
         <CModal backdrop="static" alignment="center" visible={visible} onClose={() => setVisible(false)}>
           <CModalHeader>
-            <CModalTitle><strong>{`Modify Group`}</strong></CModalTitle>
+            <CModalTitle><strong>{(isUpdating) ? `Modify Game` : `Add Game`}</strong></CModalTitle>
           </CModalHeader>
           <CModalBody>
             <CContainer>
@@ -282,43 +272,13 @@ const Users = () => {
                         type="text"
                         id="gameNameInput"
                         text=""
-                        floatingLabel="Group Name"
-                        placeholder="Input Group Name Here"
+                        floatingLabel="Game Name"
+                        placeholder="Input Game Name Here"
                         className='mb-3'
-                        // value={((isUpdating || isInserting) && selectedGroup.name === '') ? '' : selectedGroup.name}
-                        onChange={handleGroupNameChange}
+                        value={((isUpdating || isInserting) && selectedGame.game_name === '') ? '' : selectedGame.game_name}
+                        onChange={handleGameNameChange}
                         autoFocus
                       />
-                  </div>
-                  <div className='mt-3 w-100'>
-                  <CFormSelect
-                    aria-label=""
-                    placeholder='Select Sport Here'
-                    floatingLabel='Sport'
-                    // value={(isUpdating && selectedGroup.game_id === '') ? '' : selectedGroup.game_id}
-                    options={[
-                      {label : 'Select Sport Here', value: ''},
-                      ...sports.map(sport => ({ label: sport.name, value: sport._id }))
-
-                    ]}
-                    onChange={handleGameChange}
-                    disabled={isUpdating ? true : false}
-                  />
-                  </div>
-                  <div className='mt-3 w-100'>
-                    <CFormSelect
-                      aria-label=""
-                      placeholder='Select Role Here'
-                      floatingLabel='Role'
-                      // value={(isUpdating && selectedGroup.position_id === '') ? '' : selectedGroup.position_id}
-                      options={[
-                        {label : 'Select Role Here', value: ''},
-                        ...roles.map(role => ({ label: role.name, value: role._id }))
-
-                      ]}
-                      onChange={handlePositionChange}
-                      disabled={isUpdating ? true : false}
-                    />
                   </div>
                 </CCol>
               </CRow>
@@ -328,7 +288,7 @@ const Users = () => {
             <CButton color="secondary" variant="outline" onClick={() => setVisible(false)}>
               Close
             </CButton>
-            <CButton color="success" variant="outline" onClick={isUpdating ? updateGroupName : addGroup}>Save changes</CButton>
+            <CButton color="success" variant="outline" onClick={isUpdating ? updateGameName : addGame}>Save changes</CButton>
           </CModalFooter>
         </CModal>
       )}

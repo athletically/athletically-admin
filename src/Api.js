@@ -212,7 +212,21 @@ const getGames = async (searchParams) => {
   return data.data;
 }
 
+const addNewGame = async (game) => {
+  let url = API_ENDPOINT+'addGame';
+  const dataToSend = game;
+
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(dataToSend)
+  });
+  const data = await response.json();
+
+  return data;
+}
 
 
-
-export { getUsers, getSportsList, getUserDetails, updateUserDetails, getReels, updateReel, getGroups, updateGroup, getGroupDetails, getPositionList, addNewGroup, adminLogin, getGames }
+export { getUsers, getSportsList, getUserDetails, updateUserDetails, getReels, updateReel, getGroups, updateGroup, getGroupDetails, getPositionList, addNewGroup, adminLogin, getGames, addNewGame }
