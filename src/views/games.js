@@ -30,7 +30,7 @@ import {
 import {
   cilPencil
 } from '@coreui/icons'
-import { getGames, addNewGame } from '../Api';
+import { getGames, addNewGame, updateGame, getGameDetails } from '../Api';
 import { extractDate, getTypeFormatted } from '../Utils'
 
 const Users = () => {
@@ -92,12 +92,11 @@ const Users = () => {
 
   const getGameDtls = async(e) => {
     // setAlert(e.target.getAttribute('gr_id'));
-    let game = await getGameDetails(e.target.getAttribute('gr_id'));
+    let game = await getGameDetails(e.target.getAttribute('game_id'));
     if (!game) {
       setAlert('Something Went Wrong');
     }
     await setSelectedGame(game)
-    await fetchPositions(game.game_id)
     setVisible(true);
     setUpdating(true);
     setAlertVisible(false)
@@ -107,7 +106,7 @@ const Users = () => {
     const name = e.target.value;
     setSelectedGame((prevGame) => ({
       ...prevGame,
-      game_name: name === '' ? '' : name,
+      name: name === '' ? '' : name,
     }));
   };
 
@@ -127,47 +126,29 @@ const Users = () => {
 
   }
 
-  // const updateGameName = async(e) => {
-  //   let game_id = selectedGame._id;
-  //   let status = selectedGame.status;
-  //   let gameName = selectedGame.name;
+  const updateGameName = async(e) => {
+    let game_id = selectedGame._id;
+    let status = selectedGame.status;
+    let gameName = selectedGame.name;
 
-  //   const isUpdated = await updateGame(game_id, status, gameName);
+    const isUpdated = await updateGame(game_id, status, gameName);
 
-  //   if(isUpdated){
-  //     fetchGames(searchTxt, filter)
-  //     setVisible(false)
-  //   }
-  //   else{
-  //     setAlert('Unable to Modify Game. Check Game Name');
-  //     setAlertVisible(true);
-  //   }
+    if(isUpdated){
+      fetchGames(searchTxt, filter)
+      setVisible(false)
+    }
+    else{
+      setAlert('Unable to Modify Game. Check Game Name');
+      setAlertVisible(true);
+    }
 
-  // }
-
-  const handleGameChange = async(e) => {
-    const game_id = e.target.value;
-    setSelectedGame((prevGame) => ({
-      ...prevGame,
-      game_id: game_id === '' ? '' : game_id,
-    }));
-    fetchPositions(game_id);
-  }
-
-  const handlePositionChange = async(e) => {
-    const position_id = e.target.value;
-    setSelectedGame((prevGame) => ({
-      ...prevGame,
-      position_id: position_id === '' ? '' : position_id,
-    }));
-    fetchPositions(game_id);
   }
 
   const openAddGameModal = async(e) => {
     setVisible(true);
     setUpdating(false);
     setInserting(true);
-    setSelectedGame({game_name: '', status: 'active'});
+    setSelectedGame({name: '', status: 'active'});
     setAlertVisible(false)
   }
 
@@ -250,7 +231,7 @@ const Users = () => {
                 </CFormSelect>
               </CTableDataCell>
               <CTableDataCell>{extractDate(game.created_on)}</CTableDataCell>
-              <CTableDataCell className='text-center'><CIcon icon={cilPencil} gr_id={game._id} className="edit-icon" onClick={getGameDtls}/></CTableDataCell>
+              <CTableDataCell className='text-center'><CIcon icon={cilPencil} game_id={game._id} className="edit-icon" onClick={getGameDtls}/></CTableDataCell>
             </CTableRow>
           ))}
         </CTableBody>
@@ -275,7 +256,7 @@ const Users = () => {
                         floatingLabel="Game Name"
                         placeholder="Input Game Name Here"
                         className='mb-3'
-                        value={((isUpdating || isInserting) && selectedGame.game_name === '') ? '' : selectedGame.game_name}
+                        value={((isUpdating || isInserting) && selectedGame.name === '') ? '' : selectedGame.name}
                         onChange={handleGameNameChange}
                         autoFocus
                       />

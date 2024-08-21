@@ -228,5 +228,38 @@ const addNewGame = async (game) => {
   return data;
 }
 
+const updateGame = async (game_id, status, game_name) => {
+  let url = API_ENDPOINT+'modifyGame';
+  const dataToSend = {};
+  if(!game_id)
+    alert('Game ID is Required');
+  dataToSend.game_id = game_id;
+  if(status)
+    dataToSend.status = status;
+  if(game_name)
+    dataToSend.name = game_name;
 
-export { getUsers, getSportsList, getUserDetails, updateUserDetails, getReels, updateReel, getGroups, updateGroup, getGroupDetails, getPositionList, addNewGroup, adminLogin, getGames, addNewGame }
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(dataToSend)
+  });
+  const data = await response.json();
+  if(data.err)
+    return false;
+  return true;
+}
+
+
+const getGameDetails = async (id) => {
+  let url = API_ENDPOINT+'getGameDetails?game_id='+id;
+  const response = await fetch(url);
+  const data = await response.json();
+  if(data.err)
+    return {};
+  return data.data;
+}
+
+export { getUsers, getSportsList, getUserDetails, updateUserDetails, getReels, updateReel, getGroups, updateGroup, getGroupDetails, getPositionList, addNewGroup, adminLogin, getGames, addNewGame, updateGame, getGameDetails }
